@@ -1,0 +1,6 @@
+# Large PDF reference files — keep locally, do not commit
+references/*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
