@@ -44,6 +44,41 @@ MSC Nastran bulk data uses a 10-field record. Three formats are supported:
 - If no default is given, the field is required
 - Integer fields: blank is only allowed when the description explicitly permits it
 
+### Writing / generating cards
+
+When writing or generating Nastran bulk data, always use **small-field format** unless the user explicitly requests large-field or free-field. The non-negotiable rule:
+
+> **Every field is exactly 8 characters wide. Left-justify the value and pad with trailing spaces.**
+
+Column layout (80 characters total):
+
+```
+Cols  1- 8  Field  1  card name (or blank/+ for continuation)
+Cols  9-16  Field  2  first data field
+Cols 17-24  Field  3
+Cols 25-32  Field  4
+Cols 33-40  Field  5
+Cols 41-48  Field  6
+Cols 49-56  Field  7
+Cols 57-64  Field  8
+Cols 65-72  Field  9
+Cols 73-80  Field 10  continuation pointer (or blank)
+```
+
+For **comment header lines** above a card, place `$` in column 1 and align each label to the same 8-character grid:
+
+```
+$       EID     PID     G1      G2      G3      G4      THETA   ZOFFS
+CQUAD4  1       10      101     102     103     104     45.0    0.0
+$               TFLAG   T1      T2      T3      T4
++               0       0.25    0.25    0.25    0.25
+```
+
+Common mistakes to avoid:
+- Using tab characters or variable-width spaces between values
+- Forgetting that `CQUAD4` is 6 chars — it needs 2 trailing spaces to fill field 1: `CQUAD4  `
+- Placing a value in column 9 when it should start at column 9 (i.e. field 2 starts at col 9, not col 10)
+
 ### Comments ($)
 - A line beginning with `$` is a comment — ignored by the solver, appears only in the unsorted bulk data echo
 - Format: `$` followed by any text up to column 80
