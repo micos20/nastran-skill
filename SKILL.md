@@ -7,11 +7,11 @@ description: |
   CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBARL, PBEAM, PBUSH, PGAP, PROD,
   MAT1, MAT8, CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, RBE3, ENDDATA,
   SET1, SET2, SET3, SET4, ITER, NLPARM, EIGR, EIGRL, LOAD, PLOAD, PLOAD1,
-  PLOAD2, PLOAD4, FORCE, FORCE1, or FORCE2. Also trigger when the user asks
-  about field format, continuation lines, element–property–material relationships,
-  rigid elements, gap/contact elements, set definitions, load combinations,
-  pressure loads, distributed loads, concentrated forces, or any .bdf or .dat
-  file content —
+  PLOAD2, PLOAD4, FORCE, FORCE1, FORCE2, TEMP, or TEMPD. Also trigger when
+  the user asks about field format, continuation lines, element–property–material
+  relationships, rigid elements, gap/contact elements, set definitions, load
+  combinations, pressure loads, distributed loads, concentrated forces, thermal
+  loading, temperature fields, or any .bdf or .dat file content —
   even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
@@ -205,6 +205,14 @@ FORCE1    → G: GRID (where force is applied)
 FORCE2    → G: GRID (where force is applied)
              G1, G2, G3, G4: GRID (define direction via cross product)
              no property/material reference
+
+TEMP      → Gi: GRID (grid points receiving temperatures)
+             no property/material reference
+             selected by Case Control TEMP = SID
+
+TEMPD     → no GRID/property/material references
+             applies default temperature to all grids not listed on TEMP or TEMPN1
+             selected by Case Control TEMP = SID
 ```
 
 ---
@@ -255,6 +263,8 @@ FORCE2    → G: GRID (where force is applied)
 | FORCE | Static Load | references/cards/FORCE.md |
 | FORCE1 | Static Load | references/cards/FORCE1.md |
 | FORCE2 | Static Load | references/cards/FORCE2.md |
+| TEMP | Temperature Load | references/cards/TEMP.md |
+| TEMPD | Temperature Load | references/cards/TEMPD.md |
 
 ---
 
@@ -309,3 +319,5 @@ FORCE2    → G: GRID (where force is applied)
 | Concentrated force by direction vector | FORCE.md, GRID.md |
 | Concentrated force between two grids | FORCE1.md, GRID.md |
 | Concentrated force via cross product | FORCE2.md, GRID.md |
+| Grid point temperatures (thermal load) | TEMP.md, GRID.md |
+| Default temperature for all grids | TEMPD.md |
