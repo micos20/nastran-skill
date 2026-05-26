@@ -6,9 +6,11 @@ description: |
   even if they just mention a card name like GRID, CQUAD4, CTRIA3, CBAR, CBEAM,
   CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBARL, PBEAM, PBUSH, PGAP, PROD,
   MAT1, MAT8, CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, RBE3, ENDDATA,
-  SET1, SET2, SET3, SET4, ITER, NLPARM, EIGR, or EIGRL. Also trigger when the user asks about field format,
+  SET1, SET2, SET3, SET4, ITER, NLPARM, EIGR, EIGRL, LOAD, PLOAD, PLOAD1,
+  PLOAD2, or PLOAD4. Also trigger when the user asks about field format,
   continuation lines, element–property–material relationships, rigid elements,
-  gap/contact elements, set definitions, or any .bdf or .dat file content —
+  gap/contact elements, set definitions, load combinations, pressure loads,
+  distributed loads, or any .bdf or .dat file content —
   even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
@@ -173,6 +175,23 @@ ITER      → no element/property/material refs
 
 NLPARM    → no element/property/material refs
              selected by Case Control NLPARM = ID (required per nonlinear subcase)
+
+LOAD      → Li: any static load SID (FORCE, MOMENT, PLOAD, PLOAD1, PLOAD2, PLOAD4, GRAV, etc.)
+             selected by Case Control LOAD = SID
+             required when combining GRAV with any other load type
+
+PLOAD     → G1–G4: GRID (grid points defining loaded surface)
+             no element reference (load applied directly to grid point geometry)
+
+PLOAD1    → EID: CBAR, CBEAM, or CBEND element
+             no property/material reference
+
+PLOAD2    → EIDi: CQUAD4, CSHEAR, or CTRIA3 elements
+             no property/material reference
+
+PLOAD4    → EID: CHEXA, CPENTA, CPYRAM, CTETRA, CTRIA3, CTRIA6, CTRIAR, CQUAD4, CQUAD8, CQUADR
+             G1, G3/G4: GRID (for solid element face identification)
+             no property/material reference
 ```
 
 ---
@@ -215,6 +234,11 @@ NLPARM    → no element/property/material refs
 | EIGRL | Normal Modes Control | references/cards/EIGRL.md |
 | ITER | Solver Control | references/cards/ITER.md |
 | NLPARM | Nonlinear Control | references/cards/NLPARM.md |
+| LOAD | Load Combination | references/cards/LOAD.md |
+| PLOAD | Static Load | references/cards/PLOAD.md |
+| PLOAD1 | Static Load | references/cards/PLOAD1.md |
+| PLOAD2 | Static Load | references/cards/PLOAD2.md |
+| PLOAD4 | Static Load | references/cards/PLOAD4.md |
 
 ---
 
@@ -224,7 +248,7 @@ NLPARM    → no element/property/material refs
 
 | File | Contents | Size |
 |---|---|---|
-| `references/cards/*.md` | 30 pre-extracted card summaries | minimal |
+| `references/cards/*.md` | 39 pre-extracted card summaries | minimal |
 | `references/QRG-BULKDATA.pdf` | Bulk Data Entries chapter only (Ch. 9) | 27.8 MB, ~700 pp |
 | `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf` | Complete QRG — all chapters | extremely large |
 
@@ -261,3 +285,8 @@ NLPARM    → no element/property/material refs
 | Normal modes extraction (EIGRL, preferred) | EIGRL.md |
 | Iterative solver settings | ITER.md |
 | Nonlinear analysis parameters | NLPARM.md |
+| Combining load sets (incl. gravity) | LOAD.md |
+| Pressure on surface defined by grids | PLOAD.md |
+| Distributed/concentrated load on bar or beam | PLOAD1.md, CBAR.md or CBEAM.md |
+| Uniform pressure on shell elements | PLOAD2.md |
+| Pressure on shells or solid element faces | PLOAD4.md |
