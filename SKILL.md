@@ -7,10 +7,11 @@ description: |
   CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBARL, PBEAM, PBUSH, PGAP, PROD,
   MAT1, MAT8, CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, RBE3, ENDDATA,
   SET1, SET2, SET3, SET4, ITER, NLPARM, EIGR, EIGRL, LOAD, PLOAD, PLOAD1,
-  PLOAD2, or PLOAD4. Also trigger when the user asks about field format,
-  continuation lines, element–property–material relationships, rigid elements,
-  gap/contact elements, set definitions, load combinations, pressure loads,
-  distributed loads, or any .bdf or .dat file content —
+  PLOAD2, PLOAD4, FORCE, FORCE1, or FORCE2. Also trigger when the user asks
+  about field format, continuation lines, element–property–material relationships,
+  rigid elements, gap/contact elements, set definitions, load combinations,
+  pressure loads, distributed loads, concentrated forces, or any .bdf or .dat
+  file content —
   even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
@@ -192,6 +193,18 @@ PLOAD2    → EIDi: CQUAD4, CSHEAR, or CTRIA3 elements
 PLOAD4    → EID: CHEXA, CPENTA, CPYRAM, CTETRA, CTRIA3, CTRIA6, CTRIAR, CQUAD4, CQUAD8, CQUADR
              G1, G3/G4: GRID (for solid element face identification)
              no property/material reference
+
+FORCE     → G: GRID (where force is applied)
+             CID: CORDiR or CORDiC (optional, direction coordinate system)
+             no property/material reference
+
+FORCE1    → G: GRID (where force is applied)
+             G1, G2: GRID (define direction vector)
+             no property/material reference
+
+FORCE2    → G: GRID (where force is applied)
+             G1, G2, G3, G4: GRID (define direction via cross product)
+             no property/material reference
 ```
 
 ---
@@ -239,6 +252,9 @@ PLOAD4    → EID: CHEXA, CPENTA, CPYRAM, CTETRA, CTRIA3, CTRIA6, CTRIAR, CQUAD4
 | PLOAD1 | Static Load | references/cards/PLOAD1.md |
 | PLOAD2 | Static Load | references/cards/PLOAD2.md |
 | PLOAD4 | Static Load | references/cards/PLOAD4.md |
+| FORCE | Static Load | references/cards/FORCE.md |
+| FORCE1 | Static Load | references/cards/FORCE1.md |
+| FORCE2 | Static Load | references/cards/FORCE2.md |
 
 ---
 
@@ -290,3 +306,6 @@ PLOAD4    → EID: CHEXA, CPENTA, CPYRAM, CTETRA, CTRIA3, CTRIA6, CTRIAR, CQUAD4
 | Distributed/concentrated load on bar or beam | PLOAD1.md, CBAR.md or CBEAM.md |
 | Uniform pressure on shell elements | PLOAD2.md |
 | Pressure on shells or solid element faces | PLOAD4.md |
+| Concentrated force by direction vector | FORCE.md, GRID.md |
+| Concentrated force between two grids | FORCE1.md, GRID.md |
+| Concentrated force via cross product | FORCE2.md, GRID.md |
