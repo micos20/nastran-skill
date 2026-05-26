@@ -4,11 +4,12 @@ description: |
   Reference for MSC Nastran Bulk Data card syntax (BDF/DAT files). Use this skill
   whenever the user is reading, writing, or debugging Nastran bulk data entries —
   even if they just mention a card name like GRID, CQUAD4, CTRIA3, CBAR, CBEAM,
-  CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBEAM, PBUSH, PGAP, PROD, MAT1, MAT8,
-  CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, or RBE3. Also trigger when the
-  user asks about field format, continuation lines, element–property–material
-  relationships, rigid elements, gap/contact elements, or any .bdf or .dat file
-  content — even if they don't use the word "card" or "Nastran" explicitly.
+  CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBARL, PBEAM, PBUSH, PGAP, PROD,
+  MAT1, MAT8, CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, RBE3, ENDDATA,
+  SET1, SET2, SET3, or SET4. Also trigger when the user asks about field format,
+  continuation lines, element–property–material relationships, rigid elements,
+  gap/contact elements, set definitions, or any .bdf or .dat file content —
+  even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
 ## Bulk Data Format Rules
@@ -144,6 +145,19 @@ RBE3      → REFGRID: GRID (reference/dependent node)
 PGAP      → no material reference (stiffness/friction entered directly)
 
 PROD      → MID: MAT1
+
+PBARL     → MID: MAT1
+             used with CBAR (same PID as PBAR; alternative dimensional input)
+
+ENDDATA   → no dependencies (bulk data section terminator, optional)
+
+SET1      → IDi: GRID or element IDs (integer lists or THRU ranges)
+
+SET2      → MACRO: aerodynamic macro element (aeroelastic models only)
+
+SET3      → IDi: GRID, element, or property IDs depending on DES field
+
+SET4      → IDi: property IDs of TYPE (PSOLID/PSHELL/PSHEAR/PBAR/PBEAM/PWELD)
 ```
 
 ---
@@ -176,6 +190,12 @@ PROD      → MID: MAT1
 | RBE3 | Rigid Element | references/cards/RBE3.md |
 | PGAP | 1D Property | references/cards/PGAP.md |
 | PROD | 1D Property | references/cards/PROD.md |
+| PBARL | 1D Property | references/cards/PBARL.md |
+| ENDDATA | Delimiter | references/cards/ENDDATA.md |
+| SET1 | Set Definition | references/cards/SET1.md |
+| SET2 | Set Definition | references/cards/SET2.md |
+| SET3 | Set Definition | references/cards/SET3.md |
+| SET4 | Set Definition | references/cards/SET4.md |
 
 ---
 
@@ -185,7 +205,7 @@ PROD      → MID: MAT1
 
 | File | Contents | Size |
 |---|---|---|
-| `references/cards/*.md` | 24 pre-extracted card summaries | minimal |
+| `references/cards/*.md` | 30 pre-extracted card summaries | minimal |
 | `references/QRG-BULKDATA.pdf` | Bulk Data Entries chapter only (Ch. 9) | 27.8 MB, ~700 pp |
 | `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf` | Complete QRG — all chapters | extremely large |
 
@@ -214,3 +234,7 @@ PROD      → MID: MAT1
 | Rigid body element (RBE2) | RBE2.md, GRID.md |
 | Interpolation constraint (RBE3) | RBE3.md, GRID.md |
 | General rigid body (RBE1) | RBE1.md, GRID.md |
+| Bar property (dimensional input) | PBARL.md, MAT1.md, CBAR.md |
+| Set of grid/element IDs | SET1.md |
+| Typed set (grid, elem, prop) | SET3.md |
+| End of bulk data section | ENDDATA.md |
