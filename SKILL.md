@@ -4,10 +4,11 @@ description: |
   Reference for MSC Nastran Bulk Data card syntax (BDF/DAT files). Use this skill
   whenever the user is reading, writing, or debugging Nastran bulk data entries —
   even if they just mention a card name like GRID, CQUAD4, CTRIA3, CBAR, CBEAM,
-  CBUSH, PSHELL, PCOMP, PBAR, PBEAM, PBUSH, MAT1, MAT8, CORD1R, CORD2R, CORD1C,
-  or CORD2C. Also trigger when the user asks about field format, continuation lines,
-  element–property–material relationships, or any .bdf or .dat file content —
-  even if they don't use the word "card" or "Nastran" explicitly.
+  CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBEAM, PBUSH, PGAP, PROD, MAT1, MAT8,
+  CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, or RBE3. Also trigger when the
+  user asks about field format, continuation lines, element–property–material
+  relationships, rigid elements, gap/contact elements, or any .bdf or .dat file
+  content — even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
 ## Bulk Data Format Rules
@@ -121,6 +122,28 @@ GRID      → CP: CORDiR or CORDiC (input coord system, optional)
 
 CORD1R/C  → G1, G2, G3: GRID (defining grid points)
 CORD2R/C  → no GRID references (defined by coordinates)
+
+CGAP      → GA, GB: GRID          PID: PGAP
+             orientation: X1/X2/X3 or G0 (GRID), or CID (CORDiR/C)
+             CID required when GA and GB are coincident
+
+CROD      → G1, G2: GRID          PID: PROD
+
+RBE1      → GNi: GRID (independent grid points)
+             GMj: GRID (dependent grid points)
+             no property card (constraints defined directly on element)
+
+RBE2      → GN: GRID (single independent hub grid)
+             GMi: GRID (dependent grid points, any number)
+             no property card (constraints defined directly on element)
+
+RBE3      → REFGRID: GRID (reference/dependent node)
+             Gi,j: GRID (contributing/independent grids)
+             no property card (interpolation constraint, adds no stiffness)
+
+PGAP      → no material reference (stiffness/friction entered directly)
+
+PROD      → MID: MAT1
 ```
 
 ---
@@ -146,6 +169,13 @@ CORD2R/C  → no GRID references (defined by coordinates)
 | PCOMP | 2D Property | references/cards/PCOMP.md |
 | MAT1 | Material | references/cards/MAT1.md |
 | MAT8 | Material | references/cards/MAT8.md |
+| CGAP | 1D Element | references/cards/CGAP.md |
+| CROD | 1D Element | references/cards/CROD.md |
+| RBE1 | Rigid Element | references/cards/RBE1.md |
+| RBE2 | Rigid Element | references/cards/RBE2.md |
+| RBE3 | Rigid Element | references/cards/RBE3.md |
+| PGAP | 1D Property | references/cards/PGAP.md |
+| PROD | 1D Property | references/cards/PROD.md |
 
 ---
 
@@ -155,7 +185,7 @@ CORD2R/C  → no GRID references (defined by coordinates)
 
 | File | Contents | Size |
 |---|---|---|
-| `references/cards/*.md` | 17 pre-extracted card summaries | minimal |
+| `references/cards/*.md` | 24 pre-extracted card summaries | minimal |
 | `references/QRG-BULKDATA.pdf` | Bulk Data Entries chapter only (Ch. 9) | 27.8 MB, ~700 pp |
 | `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf` | Complete QRG — all chapters | extremely large |
 
@@ -179,3 +209,8 @@ CORD2R/C  → no GRID references (defined by coordinates)
 | Spring/bushing element | CBUSH.md, PBUSH.md |
 | Coordinate system | CORD2R.md (most common) or CORD1R/CORD1C/CORD2C.md |
 | Material properties | MAT1.md (isotropic) or MAT8.md (orthotropic/composite) |
+| Gap/contact element | CGAP.md, PGAP.md, GRID.md |
+| Rod element | CROD.md, PROD.md, GRID.md, MAT1.md |
+| Rigid body element (RBE2) | RBE2.md, GRID.md |
+| Interpolation constraint (RBE3) | RBE3.md, GRID.md |
+| General rigid body (RBE1) | RBE1.md, GRID.md |
