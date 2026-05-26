@@ -6,7 +6,7 @@ description: |
   even if they just mention a card name like GRID, CQUAD4, CTRIA3, CBAR, CBEAM,
   CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBARL, PBEAM, PBUSH, PGAP, PROD,
   MAT1, MAT8, CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, RBE3, ENDDATA,
-  SET1, SET2, SET3, or SET4. Also trigger when the user asks about field format,
+  SET1, SET2, SET3, SET4, ITER, NLPARM, EIGR, or EIGRL. Also trigger when the user asks about field format,
   continuation lines, element–property–material relationships, rigid elements,
   gap/contact elements, set definitions, or any .bdf or .dat file content —
   even if they don't use the word "card" or "Nastran" explicitly.
@@ -158,6 +158,21 @@ SET2      → MACRO: aerodynamic macro element (aeroelastic models only)
 SET3      → IDi: GRID, element, or property IDs depending on DES field
 
 SET4      → IDi: property IDs of TYPE (PSOLID/PSHELL/PSHEAR/PBAR/PBEAM/PWELD)
+
+EIGR      → no element/property/material refs
+             selected by Case Control METHOD = SID
+             EIGRL takes precedence when same SID exists
+
+EIGRL     → no element/property/material refs
+             selected by Case Control METHOD = SID
+             takes precedence over EIGR when same SID
+
+ITER      → no element/property/material refs
+             selected by Case Control SMETHOD = SID
+             key=value syntax on continuation lines (no spaces within each token)
+
+NLPARM    → no element/property/material refs
+             selected by Case Control NLPARM = ID (required per nonlinear subcase)
 ```
 
 ---
@@ -196,6 +211,10 @@ SET4      → IDi: property IDs of TYPE (PSOLID/PSHELL/PSHEAR/PBAR/PBEAM/PWELD)
 | SET2 | Set Definition | references/cards/SET2.md |
 | SET3 | Set Definition | references/cards/SET3.md |
 | SET4 | Set Definition | references/cards/SET4.md |
+| EIGR | Normal Modes Control | references/cards/EIGR.md |
+| EIGRL | Normal Modes Control | references/cards/EIGRL.md |
+| ITER | Solver Control | references/cards/ITER.md |
+| NLPARM | Nonlinear Control | references/cards/NLPARM.md |
 
 ---
 
@@ -238,3 +257,7 @@ SET4      → IDi: property IDs of TYPE (PSOLID/PSHELL/PSHEAR/PBAR/PBEAM/PWELD)
 | Set of grid/element IDs | SET1.md |
 | Typed set (grid, elem, prop) | SET3.md |
 | End of bulk data section | ENDDATA.md |
+| Normal modes extraction (EIGR) | EIGR.md |
+| Normal modes extraction (EIGRL, preferred) | EIGRL.md |
+| Iterative solver settings | ITER.md |
+| Nonlinear analysis parameters | NLPARM.md |
