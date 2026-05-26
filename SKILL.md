@@ -7,11 +7,13 @@ description: |
   CBUSH, CGAP, CROD, PSHELL, PCOMP, PBAR, PBARL, PBEAM, PBUSH, PGAP, PROD,
   MAT1, MAT8, CORD1R, CORD2R, CORD1C, CORD2C, RBE1, RBE2, RBE3, ENDDATA,
   SET1, SET2, SET3, SET4, ITER, NLPARM, EIGR, EIGRL, LOAD, PLOAD, PLOAD1,
-  PLOAD2, PLOAD4, FORCE, FORCE1, FORCE2, TEMP, or TEMPD. Also trigger when
-  the user asks about field format, continuation lines, element–property–material
-  relationships, rigid elements, gap/contact elements, set definitions, load
-  combinations, pressure loads, distributed loads, concentrated forces, thermal
-  loading, temperature fields, or any .bdf or .dat file content —
+  PLOAD2, PLOAD4, FORCE, FORCE1, FORCE2, TEMP, TEMPD, MPC, SPC, SPC1,
+  MPCADD, or SPCADD. Also trigger when the user asks about field format,
+  continuation lines, element–property–material relationships, rigid elements,
+  gap/contact elements, set definitions, load combinations, pressure loads,
+  distributed loads, concentrated forces, thermal loading, temperature fields,
+  single-point constraints, multipoint constraints, enforced displacement,
+  or any .bdf or .dat file content —
   even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
@@ -213,6 +215,29 @@ TEMP      → Gi: GRID (grid points receiving temperatures)
 TEMPD     → no GRID/property/material references
              applies default temperature to all grids not listed on TEMP or TEMPN1
              selected by Case Control TEMP = SID
+
+MPC       → Gj: GRID (constrained grid points)
+             no property/material reference
+             selected by Case Control MPC = SID
+             first DOF (G1,C1) is the dependent DOF
+
+MPCADD    → Sj: MPC set IDs (union of MPC entries)
+             no GRID/property/material reference
+             selected by Case Control MPC = SID
+             takes precedence over MPC with same SID
+
+SPC       → Gi: GRID (constrained grid points)
+             no property/material reference
+             selected by Case Control SPC = SID
+
+SPC1      → Gi: GRID (constrained grid points, list or THRU range)
+             no property/material reference
+             selected by Case Control SPC = SID
+
+SPCADD    → Si: SPC/SPC1 set IDs (union)
+             no GRID/property/material reference
+             selected by Case Control SPC = SID
+             takes precedence over SPC/SPC1 with same SID
 ```
 
 ---
@@ -265,6 +290,11 @@ TEMPD     → no GRID/property/material references
 | FORCE2 | Static Load | references/cards/FORCE2.md |
 | TEMP | Temperature Load | references/cards/TEMP.md |
 | TEMPD | Temperature Load | references/cards/TEMPD.md |
+| MPC | Multipoint Constraint | references/cards/MPC.md |
+| MPCADD | MP Constraint Combo | references/cards/MPCADD.md |
+| SPC | SP Constraint | references/cards/SPC.md |
+| SPC1 | SP Constraint | references/cards/SPC1.md |
+| SPCADD | SP Constraint Combo | references/cards/SPCADD.md |
 
 ---
 
@@ -321,3 +351,8 @@ TEMPD     → no GRID/property/material references
 | Concentrated force via cross product | FORCE2.md, GRID.md |
 | Grid point temperatures (thermal load) | TEMP.md, GRID.md |
 | Default temperature for all grids | TEMPD.md |
+| Multipoint constraint equation | MPC.md, GRID.md |
+| Combining MPC sets | MPCADD.md |
+| Single-point constraint (with enforced displacement) | SPC.md, GRID.md |
+| Single-point constraint on a list of grids | SPC1.md, GRID.md |
+| Combining SPC/SPC1 sets | SPCADD.md |
