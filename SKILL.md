@@ -304,9 +304,8 @@ SPCADD    → Si: SPC/SPC1 set IDs (union)
 
 | File | Contents | Size |
 |---|---|---|
-| `references/cards/*.md` | 39 pre-extracted card summaries | minimal |
-| `references/QRG-BULKDATA.pdf` | Bulk Data Entries chapter only (Ch. 9) | 27.8 MB, ~700 pp |
-| `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf` | Complete QRG — all chapters | extremely large |
+| `references/cards/*.md` | 49 pre-extracted card summaries | minimal |
+| `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf` | Complete QRG — all chapters (local dev only, not in git) | 34.8 MB |
 
 **Always cite MSC Nastran version 2025.1 when referencing QRG content.**
 
@@ -314,8 +313,8 @@ SPCADD    → Si: SPC/SPC1 set IDs (union)
 
 1. Identify which cards are relevant to the task (element + its grids, property, and material form the dependency chain).
 2. Read only the needed files from `references/cards/`. Do not load all files at once — load on demand.
-3. For cards **not** in the index, the first fallback is `references/QRG-BULKDATA.pdf` (Bulk Data chapter only). **Before reading it, explicitly ask the user for permission**, e.g.: *"The card XYZ is not in the quick-reference index. Looking it up in the QRG Bulk Data PDF will use a significant number of tokens. Do you want me to proceed?"* Only read the PDF after the user confirms. Use the approximate page formula: `PDF_page ≈ QRG_page − 1018`. The bulk data chapter (Chapter 9) starts around PDF page 230.
-4. For topics outside the Bulk Data chapter (Case Control, Executive Control, solution sequences, etc.), the fallback is `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf`. This file is extremely large. **Always ask for explicit user permission before opening it**, with a clear warning, e.g.: *"This topic requires the full QRG (very large file — high token cost). Do you want me to look it up?"*
+3. For cards **not** in the index, fall back to `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf`. This file is large (34.8 MB). **Always ask for explicit user permission before opening it**, e.g.: *"The card XYZ is not in the quick-reference index. Looking it up in the full QRG will use a significant number of tokens. Do you want me to proceed?"* Only read the PDF after the user confirms. Use the page formula: `PDF_page = QRG_page + 32`. The Bulk Data chapter (Chapter 9) starts around QRG page 1019 (PDF page 1051).
+4. For topics outside the Bulk Data chapter (Case Control, Executive Control, solution sequences, etc.), the same file and the same permission rule apply. The page formula is identical: `PDF_page = QRG_page + 32`.
 
 ### Typical loading patterns
 
