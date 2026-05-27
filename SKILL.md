@@ -13,7 +13,10 @@ description: |
   gap/contact elements, set definitions, load combinations, pressure loads,
   distributed loads, concentrated forces, thermal loading, temperature fields,
   single-point constraints, multipoint constraints, enforced displacement,
-  or any .bdf or .dat file content —
+  or any .bdf or .dat file content.
+  Also trigger for Case Control topics: SUBCASE, subcase scope, output requests,
+  SET command, LOAD/SPC/METHOD/NLPARM/TEMP selection in Case Control, or the
+  structure of the input file (Executive Control / Case Control / Bulk Data) —
   even if they don't use the word "card" or "Nastran" explicitly.
 ---
 
@@ -92,6 +95,130 @@ Common mistakes to avoid:
 - Example: `$ TEST FIXTURE-THIRD MODE`
 - A `$` can also appear mid-line to terminate a fixed-field or free-field entry; all fields after the `$` are treated as blank (requires default IFPSTAR=YES)
 - Example: `GRID, 101, , 1.0, 2.0, 0.0 $ node at (1,2,0)`
+
+---
+
+## Case Control Format Rules
+
+The Case Control section sits between the Executive Control deck and `BEGIN BULK`. It selects loads and constraints, requests output, and defines the subcase structure.
+
+### Input file structure
+
+```
+$ Executive Control
+SOL 101
+CEND
+$------- Case Control -----------------------------------------------
+TITLE = My Analysis
+SPC   = 1
+LOAD  = 10
+SUBCASE 1
+  LOAD = 100
+  DISPLACEMENT = ALL
+SUBCASE 2
+  LOAD = 200
+  DISPLACEMENT = ALL
+BEGIN BULK
+$------- Bulk Data --------------------------------------------------
+```
+
+`CEND` ends Executive Control and starts Case Control. `BEGIN BULK` ends Case Control and starts Bulk Data.
+
+### Format rules
+
+- **Free format** — no fixed column widths (unlike bulk data's 8-character fields)
+- **Case-insensitive** — `SPC`, `spc`, `Spc` are all equivalent
+- **Comments** — `$` in column 1, same as bulk data
+- **Abbreviation** — commands may be shortened to the first 4 characters if that abbreviation is unique among all commands (e.g., `DISP` for `DISPLACEMENT`); if not unique, specify the full name or at least the first 8 characters
+- **Continuation** — if a command exceeds 72 columns, end the line with a comma and continue on the next line:
+  ```
+  SET 1 = 5, 6, 7, 8, 9,
+          10 THRU 55
+  ```
+
+### Command syntax forms
+
+| Pattern | Example | Notes |
+|---|---|---|
+| `CMD = value` | `LOAD = 10` | Most data-selection commands |
+| `CMD = ALL` | `DISPLACEMENT = ALL` | All applicable entities |
+| `CMD = NONE` | `STRESS = NONE` | Suppress output |
+| `CMD = n` | `DISPLACEMENT = 1` | Entities in SET n |
+| `CMD(opt) = value` | `STRESS(SORT1,PRINT) = ALL` | Options in parentheses |
+| `CMD n` (no `=`) | `SUBCASE 10` | Subcase delimiters |
+
+The `=` sign is optional for some commands (`SUBCASE 10` and `SUBCASE = 10` are equivalent).
+
+### Notation in QRG format descriptions
+
+| Symbol | Meaning |
+|---|---|
+| `UPPERCASE` | Keyword — must be entered exactly as shown |
+| `lowercase` | Variable — user supplies the value; type and range given in parentheses |
+| `{ }` (braces) | Mandatory choice — pick exactly one of the stacked options |
+| `[ ]` (brackets) | Optional group — may be omitted entirely; if options are stacked, pick one |
+| Shaded option | Default — used when the optional group is omitted |
+
+### Scope: global vs. subcase-local
+
+Commands before the first `SUBCASE` are **global** — they apply to all subcases unless overridden. Commands inside a `SUBCASE` block are **local** — they apply only to that subcase and override any matching global command.
+
+```
+SPC  = 1          $ global: all subcases use SPC set 1 unless overridden
+LOAD = 10         $ global default load
+SUBCASE 1
+  LOAD = 100      $ local: overrides global LOAD for subcase 1
+SUBCASE 2
+  LOAD = 200
+  SPC  = 2        $ local: overrides global SPC = 1 for subcase 2 only
+```
+
+### SET command
+
+`SET` defines a list of IDs that output-request commands reference by number:
+
+```
+SET 1 = 101, 102, 103, 110 THRU 120
+SET 2 = ALL
+DISPLACEMENT = 1   $ output only the grid points in SET 1
+STRESS = ALL       $ output for all elements
+```
+
+- `ALL` — all applicable entities
+- `NONE` — suppress output
+- `n` — entities in SET n (integers, THRU ranges, or a mix)
+
+### Subcase delimiter commands
+
+| Command | Purpose |
+|---|---|
+| `SUBCASE n` | Standard subcase |
+| `SUBCOM n` | Combination subcase (linear combination of previous subcases) |
+| `SYM n` | Symmetry subcase |
+| `SYMCOM n` | Symmetry combination subcase |
+| `REPCASE n` | Repeated output request subcase |
+
+### Command categories (Chapter 5 overview)
+
+Case Control commands fall into three broad groups:
+
+**Subcase definition** — delimiters (`SUBCASE`, `SYM`, `SUBCOM`), subcase control (`MASTER`, `MODES`), combination coefficients (`SUBSEQ`, `SYMSEQ`)
+
+**Data selection** — selects which Bulk Data entries are active for each subcase:
+- Static loads: `LOAD`, `DEFORM`
+- Dynamic loads: `DLOAD`, `LOADSET`, `NONLINEAR`
+- Constraints: `SPC`, `MPC`, `AUTOSPC`, `BC`
+- Temperatures: `TEMPERATURE`
+- Eigenvalue / solver: `METHOD`, `SMETHOD`, `CMETHOD`
+- Nonlinear: `NLPARM`, `NLSTEP`
+
+**Output selection** — controls what is written to the .f06/.punch/.op2:
+- `DISPLACEMENT`, `VELOCITY`, `ACCELERATION`
+- `STRESS`, `STRAIN`, `FORCE`, `SPCFORCES`, `MPCFORCES`
+- `OLOAD`, `ESE` (element strain energy)
+- `ECHO`, `LABEL`, `TITLE`, `SUBTITLE`
+
+Individual command reference files will be added to `references/cards/` as they are extracted.
 
 ---
 
@@ -313,8 +440,8 @@ SPCADD    → Si: SPC/SPC1 set IDs (union)
 
 1. Identify which cards are relevant to the task (element + its grids, property, and material form the dependency chain).
 2. Read only the needed files from `references/cards/`. Do not load all files at once — load on demand.
-3. For cards **not** in the index, fall back to `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf`. This file is large (34.8 MB). **Always ask for explicit user permission before opening it**, e.g.: *"The card XYZ is not in the quick-reference index. Looking it up in the full QRG will use a significant number of tokens. Do you want me to proceed?"* Only read the PDF after the user confirms. Use the page formula: `PDF_page = QRG_page + 32`. The Bulk Data chapter (Chapter 9) starts around QRG page 1019 (PDF page 1051).
-4. For topics outside the Bulk Data chapter (Case Control, Executive Control, solution sequences, etc.), the same file and the same permission rule apply. The page formula is identical: `PDF_page = QRG_page + 32`.
+3. For cards **not** in the index, fall back to `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf`. This file is large (34.8 MB). **Always ask for explicit user permission before opening it**, e.g.: *"The card XYZ is not in the quick-reference index. Looking it up in the full QRG will use a significant number of tokens. Do you want me to proceed?"* Only read the PDF after the user confirms. Use the page formula: `PDF_page = QRG_page + 32`. The Bulk Data chapter (Chapter 9) starts at QRG page 1019 (PDF page 1051).
+4. For Case Control commands not yet in the index, the same file and the same permission rule apply. Chapter 5 starts at QRG page 175 (PDF page 207). The page formula is identical: `PDF_page = QRG_page + 32`. Case Control command files will live in `references/cards/` with a `(Case)` suffix in their title when added.
 
 ### Typical loading patterns
 
