@@ -15,11 +15,14 @@ description: |
   single-point constraints, multipoint constraints, enforced displacement,
   or any .bdf or .dat file content.
   Also trigger for Case Control topics: SUBCASE, STATSUB, NONLINEAR, OUTPUT,
-  subcase scope, output requests, SET command, LOAD/SPC/METHOD/NLPARM/TEMP
+  ANALYSIS, METHOD, NLBUCK, NLOPRM, NLSTEP, STEP, TEMPERATURE,
+  subcase scope, output requests, SET command, LOAD/SPC/MPC/METHOD/NLPARM/TEMP
   selection in Case Control, subcase delimiters, static load set selection,
-  differential stiffness, buckling preload, or the structure of the input file
-  (Executive Control / Case Control / Bulk Data) — even if they don't use the
-  word "card" or "Nastran" explicitly.
+  differential stiffness, buckling preload, nonlinear step control, analysis
+  type selection, eigenvalue method, thermal loading, temperature-dependent
+  material, or the structure of the input file (Executive Control / Case
+  Control / Bulk Data) — even if they don't use the word "card" or "Nastran"
+  explicitly.
 ---
 
 ## Bulk Data Format Rules
@@ -393,6 +396,39 @@ STATSUB     → n: subcase ID of a prior static SUBCASE
 SUBCASE     → n: integer subcase ID (must be increasing)
                delimits all data/output selection commands for one load case
                in SOL 106/129: chains solutions (end state = next initial state)
+
+ANALYSIS    → no Bulk Data references
+               specifies analysis type per SUBCASE/STEP/SUBSTEP
+               SOL 400: one per STEP (single physics) or per SUBSTEP (coupled)
+               SOL 200: required in every SUBCASE
+
+METHOD      → n: EIGR, EIGRL, or EIGB Bulk Data SID
+               EIGRL takes precedence over EIGR when same SID
+
+MPC (Case)  → n: MPC or MPCADD Bulk Data SID
+               may also select rigid elements via SET3 (RBEin/RBEex)
+               in SOL 400: RIGID=LINEAR required to use rigid element set selection
+
+NLBUCK      → no Bulk Data references (uses existing NLSTEP for load increments)
+               SOL 400 only; must be in same STEP/SUBCASE as NLSTEP
+               NLPARM is NOT allowed with NLBUCK
+
+NLOPRM      → no Bulk Data references
+               keyword=value syntax; SOL 400 output/debug control only
+
+NLSTEP (Case) → n: NLSTEP Bulk Data entry SID
+                 if present anywhere in SUBCASE, all NLPARM in that SUBCASE are ignored
+                 SOL 400 and SOL 101 linear contact only
+
+SPC (Case)  → n: SPC, SPC1, SPCADD Bulk Data SID
+
+STEP        → n: integer step ID (increasing within SUBCASE)
+               SOL 400 only; continuation of previous STEP within same SUBCASE
+               solutions chain (end state = next initial state)
+
+TEMPERATURE → n: TEMP, TEMPD, TEMPP1, TEMPB3, TEMPRB, or TEMPAX Bulk Data SID
+               LOAD/MATERIAL/INITIAL/BOTH options control usage
+               HSUBCASE/HSTEP/HTIME keywords for multi-physics thermal coupling (SOL 400)
 ```
 
 ---
@@ -456,6 +492,15 @@ SUBCASE     → n: integer subcase ID (must be increasing)
 | OUTPUT | CC Section Delimiter | references/cards/OUTPUT.md |
 | STATSUB | CC Data Selection | references/cards/STATSUB.md |
 | SUBCASE | CC Subcase Delimiter | references/cards/SUBCASE.md |
+| ANALYSIS | CC Analysis Type | references/cards/ANALYSIS.md |
+| METHOD | CC Data Selection | references/cards/METHOD.md |
+| MPC (Case) | CC Constraint Selection | references/cards/MPC_Case.md |
+| NLBUCK | CC NL Analysis | references/cards/NLBUCK.md |
+| NLOPRM | CC NL Options | references/cards/NLOPRM.md |
+| NLSTEP (Case) | CC NL Step Selection | references/cards/NLSTEP_Case.md |
+| SPC (Case) | CC Constraint Selection | references/cards/SPC_Case.md |
+| STEP | CC Step Delimiter | references/cards/STEP.md |
+| TEMPERATURE | CC Data Selection | references/cards/TEMPERATURE.md |
 
 ---
 
@@ -465,7 +510,7 @@ SUBCASE     → n: integer subcase ID (must be increasing)
 
 | File | Contents | Size |
 |---|---|---|
-| `references/cards/*.md` | 55 pre-extracted card/command summaries | minimal |
+| `references/cards/*.md` | 64 pre-extracted card/command summaries | minimal |
 | `references/MSC_Nastran_2025.1_Quick_Reference_Guide.pdf` | Complete QRG — all chapters (local dev only, not in git) | 34.8 MB |
 
 **Always cite MSC Nastran version 2025.1 when referencing QRG content.**
@@ -522,3 +567,12 @@ SUBCASE     → n: integer subcase ID (must be increasing)
 | Open structure/curve plotter command block | OUTPUT.md |
 | Differential stiffness / buckling preload reference | STATSUB.md |
 | Define a new subcase | SUBCASE.md |
+| Specify analysis type per subcase/step (SOL 400/200) | ANALYSIS.md |
+| Select eigenvalue extraction method | METHOD.md, EIGR.md or EIGRL.md |
+| Select multipoint constraint set | MPC_Case.md |
+| Nonlinear buckling prediction (SOL 400) | NLBUCK.md, NLSTEP_Case.md |
+| SOL 400 nonlinear output/debug options | NLOPRM.md |
+| Select nonlinear step control (SOL 400) | NLSTEP_Case.md |
+| Select single-point constraint set | SPC_Case.md |
+| Define a nonlinear step in SOL 400 | STEP.md, ANALYSIS.md |
+| Thermal load or temperature-dependent material | TEMPERATURE.md, TEMP.md, TEMPD.md |
